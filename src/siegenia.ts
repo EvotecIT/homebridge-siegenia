@@ -159,40 +159,6 @@ export class SiegeniaDevice extends EventEmitter {
         }, delay);
     }
 
-
-    // // This is a simplified example and might not match your actual code
-    // heartbeat(callback: Function): void {
-    //     if (!this.websocket || this.websocket === null) {
-    //         return;
-    //     }
-
-    //     const message = {
-    //         command: 'keepAlive',
-    //         params: { extend_session: true },
-    //         id: 3
-    //     };
-
-    //     this.websocket.send(JSON.stringify(message), (err) => {
-    //         if (err) {
-    //             callback(err);
-    //             return;
-    //         }
-
-    //         this.websocket.on('message', (message) => {
-    //             if (typeof message !== 'string') {
-    //                 return;
-    //             }
-
-    //             const response: Response = JSON.parse(message);
-    //             if (response.id === message.id && response.status === 'ok') {
-    //                 callback(null, response);
-    //             } else {
-    //                 callback(new Error(`Response from heartbeat "${response.status}" is not ok`));
-    //             }
-    //         });
-    //     });
-    // }
-
     getDeviceState(callback: Function): void {
         this.sendRequest('getDeviceState', callback);
     }
