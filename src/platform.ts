@@ -2,6 +2,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SiegeniaAccessory } from './platformAccessory';
 import { SiegeniaDevice } from './siegenia';
+import { DeviceTypeMap } from './siegeniaMapping';
 
 export class SiegeniaPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
@@ -44,6 +45,43 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                 this.log.info('Logged in successfully');
                 // You can now call other methods on the `device` object
             });
+
+            this.device?.getDeviceInfo((err, info) => {
+                if (err) {
+                    this.log.error('Failed to get device info:', err);
+                    return;
+                }
+
+                this.log.info('Device Info:', info);
+
+                // hardcoded example of how to handle different device types
+                if (info.data.type == 6) {
+                    this.log.info('This is a device of type ' + DeviceTypeMap[info.data.type] + " and is supported");
+                } else {
+                    this.log.info("This device ", DeviceTypeMap[info.data.type], " is not supported - feel free to open an issue or pull request on GitHub");
+                    return;
+                }
+            });
+
+            // Fetch and log device params
+            this.device?.getDeviceParams((err, params) => {
+                if (err) {
+                    this.log.error('Failed to get device params:', err);
+                    return;
+                }
+
+                this.log.info('Device Params:', params);
+            });
+
+            // Fetch and log device details
+            // this.device?.getDeviceDetails((err, details) => {
+            //     if (err) {
+            //         this.log.error('Failed to get device details:', err);
+            //         return;
+            //     }
+
+            //     this.log.info('Device Details:', details);
+            // });
         });
 
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
@@ -74,6 +112,7 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
      * must not be registered again to prevent "duplicate UUID" errors.
      */
     discoverDevices() {
+
 
         // EXAMPLE ONLY
         // A real plugin you would discover accessories from the local network, cloud services
