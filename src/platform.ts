@@ -3,6 +3,32 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SiegeniaAccessory } from './platformAccessory';
 
+import { SiegeniaDevice } from './siegenia'; // Adjust the path according to your project structure
+
+const device = new SiegeniaDevice({
+    ip: '192.168.241.198', // replace with your device IP
+    port: 443, // optional, default is 443
+    wsProtocol: 'wss', // optional, default is 'wss'
+    logger: console.log, // optional, default is an empty function
+});
+
+device.connect((err) => {
+    if (err) {
+        console.error('Failed to connect:', err);
+        return;
+    }
+
+    device.loginUser('admin', '', (err) => { // replace 'username' and 'password' with your credentials
+        if (err) {
+            console.error('Failed to login:', err);
+            return;
+        }
+
+        console.log('Logged in successfully');
+        // You can now call other methods on the `device` object
+    });
+});
+
 /**
  * HomebridgePlatform
  * This class is the main constructor for your plugin, this is where you should
@@ -56,12 +82,12 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
         // or a user-defined array in the platform config.
         const exampleDevices = [
             {
-                exampleUniqueId: 'ABCD',
-                exampleDisplayName: 'Bedroom',
+                uniqueId: 'ABCD',
+                displayName: 'Bedroom',
             },
             {
-                exampleUniqueId: 'EFGH',
-                exampleDisplayName: 'Kitchen',
+                uniqueId: 'EFGH',
+                displayName: 'Kitchen',
             },
         ];
 
@@ -71,7 +97,7 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
             // generate a unique id for the accessory this should be generated from
             // something globally unique, but constant, for example, the device serial
             // number or MAC address
-            const uuid = this.api.hap.uuid.generate(device.exampleUniqueId);
+            const uuid = this.api.hap.uuid.generate(device.uniqueId);
 
             // see if an accessory with the same uuid has already been registered and restored from
             // the cached devices we stored in the `configureAccessory` method above
@@ -95,10 +121,10 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                 // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
             } else {
                 // the accessory does not yet exist, so we need to create it
-                this.log.info('Adding new accessory:', device.exampleDisplayName);
+                this.log.info('Adding new accessory:', device.displayName);
 
                 // create a new accessory
-                const accessory = new this.api.platformAccessory(device.exampleDisplayName, uuid);
+                const accessory = new this.api.platformAccessory(device.displayName, uuid);
 
                 // store a copy of the device object in the `accessory.context`
                 // the `context` property can be used to store any data about the accessory you may need
