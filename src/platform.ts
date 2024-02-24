@@ -1,52 +1,50 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic } from 'homebridge';
-
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SiegeniaAccessory } from './platformAccessory';
+import { SiegeniaDevice } from './siegenia';
 
-import { SiegeniaDevice } from './siegenia'; // Adjust the path according to your project structure
-
-const device = new SiegeniaDevice({
-    ip: '192.168.241.198', // replace with your device IP
-    port: 443, // optional, default is 443
-    wsProtocol: 'wss', // optional, default is 'wss'
-    logger: console.log, // optional, default is an empty function
-});
-
-device.connect((err) => {
-    if (err) {
-        console.error('Failed to connect:', err);
-        return;
-    }
-
-    device.loginUser('admin', '', (err) => { // replace 'username' and 'password' with your credentials
-        if (err) {
-            console.error('Failed to login:', err);
-            return;
-        }
-
-        console.log('Logged in successfully');
-        // You can now call other methods on the `device` object
-    });
-});
-
-/**
- * HomebridgePlatform
- * This class is the main constructor for your plugin, this is where you should
- * parse the user config and discover/register accessories with Homebridge.
- */
 export class SiegeniaPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
     public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
 
+    private readonly device?: SiegeniaDevice;
     // this is used to track restored cached accessories
     public readonly accessories: PlatformAccessory[] = [];
 
-    constructor(
-        public readonly log: Logger,
-        public readonly config: PlatformConfig,
-        public readonly api: API,
-    ) {
+    constructor(public readonly log: Logger, public readonly config: PlatformConfig, public readonly api: API) {
         this.log.debug('Finished initializing platform:', this.config.name);
+
+        // Check if necessary config values are provided
+        if (!this.config.ip || !this.config.username || !this.config.password) {
+            setInterval(() => {
+                this.log.error('Missing necessary config values: ip, port, username, password');
+            }, 5000); // Log the message every 5 seconds
+            return;
+        }
+
+        this.device = new SiegeniaDevice({
+            ip: this.config.ip, // replace with your device IP
+            port: this.config.port || 443, // optional, default is 443
+            wsProtocol: this.config.wsProtocol || 'wss', // optional, default is 'wss'
+            logger: (message: string) => this.log.info(message),
+        });
+
+        this.device.connect((err) => {
+            if (err) {
+                this.log.error('Failed to connect:', err);
+                return;
+            }
+
+            this.device?.loginUser(this.config.username, this.config.password, (err) => { // replace 'username' and 'password' with your credentials
+                if (err) {
+                    this.log.error('Failed to login:', err);
+                    return;
+                }
+
+                this.log.info('Logged in successfully');
+                // You can now call other methods on the `device` object
+            });
+        });
 
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
         // Dynamic Platform plugins should only register new accessories after this event was fired,
