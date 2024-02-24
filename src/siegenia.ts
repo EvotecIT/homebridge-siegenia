@@ -151,7 +151,7 @@ export class SiegeniaDevice extends EventEmitter {
                 }
 
                 // Log the successful heartbeat
-                console.log('Heartbeat successful', response);
+                //console.log('Heartbeat successful', response);
 
                 // Call the heartbeat method again to keep the session alive
                 this.heartbeat(delay);
