@@ -1,9 +1,7 @@
-﻿import { CharacteristicValue, HAP, Logging } from 'homebridge';
-import { SiegeniaPlatform } from './platform';
+﻿import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
 import { DeviceTypeMap } from './siegeniaMapping';
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid } from 'homebridge';
-
+import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP, Logging } from 'homebridge';
 
 export class SiegeniaWindowAccessory {
     private readonly log: Logger;
@@ -35,8 +33,6 @@ export class SiegeniaWindowAccessory {
 
         // create a new Window service
         this.service = new this.api.hap.Service.Window(this.name);
-
-        //this.updateDeviceInformation();
 
         // create handlers for required characteristics
         this.service.getCharacteristic(this.api.hap.Characteristic.CurrentPosition)
@@ -96,10 +92,7 @@ export class SiegeniaWindowAccessory {
         this.device.getDeviceInfo(callback);
     }
 
-
-    /**
-     * Handle requests to get the current value of the "Current Position" characteristic
-     */
+    // Handle requests to get the current value of the "Current Position" characteristic
     handleCurrentPositionGet() {
         this.log.debug('Triggered GET CurrentPosition');
 
@@ -127,9 +120,7 @@ export class SiegeniaWindowAccessory {
         return currentValue;
     }
 
-    /**
-     * Handle requests to get the current value of the "Position State" characteristic
-     */
+    // Handle requests to get the current value of the "Position State" characteristic
     handlePositionStateGet() {
         this.log.debug('Triggered GET PositionState');
 
@@ -147,10 +138,7 @@ export class SiegeniaWindowAccessory {
         return currentValue;
     }
 
-
-    /**
-     * Handle requests to get the current value of the "Target Position" characteristic
-     */
+    // Handle requests to get the current value of the "Target Position" characteristic
     handleTargetPositionGet() {
         this.log.debug('Triggered GET TargetPosition');
 
@@ -158,9 +146,7 @@ export class SiegeniaWindowAccessory {
         return this.targetPosition;
     }
 
-    /**
-     * Handle requests to set the "Target Position" characteristic
-     */
+    // Handle requests to set the "Target Position" characteristic
     handleTargetPositionSet(value: CharacteristicValue) {
         this.log.debug('Triggered SET TargetPosition:', value);
 
