@@ -96,61 +96,6 @@ export class SiegeniaWindowAccessory {
         this.device.getDeviceInfo(callback);
     }
 
-    updateDeviceInformation() {
-        this.device.connect((err) => {
-            if (err) {
-                this.log.error('Failed to connect:', err);
-                return;
-            }
-
-            this.device?.loginUser(this.config.username, this.config.password, (err) => { // replace 'username' and 'password' with your credentials
-                if (err) {
-                    this.log.error('Failed to login:', err);
-                    return;
-                }
-
-                this.log.info('Logged in successfully');
-                // You can now call other methods on the `device` object
-            });
-
-            this.device?.getDeviceInfo((err, info) => {
-                if (err) {
-                    this.log.error('Failed to get device info:', err);
-                    return;
-                }
-
-                this.log.info('Device Info:', info);
-
-                // hardcoded example of how to handle different device types
-                if (info.data.type == 6) {
-                    this.log.info('This is a device of type ' + DeviceTypeMap[info.data.type] + " and is supported");
-                } else {
-                    this.log.info("This device ", DeviceTypeMap[info.data.type], " is not supported - feel free to open an issue or pull request on GitHub");
-                    return;
-                }
-            });
-
-            // Fetch and log device params
-            this.device?.getDeviceParams((err, params) => {
-                if (err) {
-                    this.log.error('Failed to get device params:', err);
-                    return;
-                }
-
-                this.log.info('Device Params:', params);
-            });
-
-            // Fetch and log device details
-            // this.device?.getDeviceDetails((err, details) => {
-            //     if (err) {
-            //         this.log.error('Failed to get device details:', err);
-            //         return;
-            //     }
-
-            //     this.log.info('Device Details:', details);
-            // });
-        });
-    }
 
     /**
      * Handle requests to get the current value of the "Current Position" characteristic
