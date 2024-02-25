@@ -1,16 +1,37 @@
 {
-  "pluginAlias": "ExampleHomebridgePlugin",
-  "pluginType": "platform",
-  "singular": true,
-  "schema": {
-    "type": "object",
-    "properties": {
-      "name": {
-        "title": "Name",
-        "type": "string",
-        "required": true,
-        "default": "Example Dynamic Platform"
-      }
+    "pluginAlias": "Siegenia",
+    "pluginType": "platform",
+    "headerDisplay": "Basic support for Siegenia MHS Family Windoiws. See the [homebridge-siegenia](https://github.com/EvotecIT/homebridge-siegenia) page for more information.",
+    "footerDisplay": "This plugin is provided by [Evotec](https://www.evotec.xyz).",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "ip": {
+                "title": "Device IP",
+                "description": "Hostname or IP address of your device",
+                "placeholder": "e.g. 1.2.3.4",
+                "type": "string",
+                "format": "hostname"
+            },
+            "port": {
+                "title": "Device Port",
+                "description": "Port of your device. Default is 443. If you are using different port please change it here.",
+                "type": "integer",
+                "default": 443
+            },
+            "username": {
+                "description": "Username",
+                "type": "string"
+            },
+            "password": {
+                "description": "Password",
+                "type": "string"
+            }
+        },
+        "required": [
+            "ip",
+            "username",
+            "password"
+        ]
     }
-  }
 }
