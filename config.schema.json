@@ -33,7 +33,7 @@
                 "type": "integer",
                 "default": 3
             },
-            "waitTimeBetweenRetries": {
+            "retryInterval": {
                 "title": "First Wait Time Between Retries",
                 "description": "First Wait time between retries in seconds. Default is 5. This is doubled after each retry.",
                 "type": "integer",
@@ -51,9 +51,15 @@
                 "type": "integer",
                 "default": 10
             },
+            "informational": {
+                "title": "Informational logging",
+                "description": "Set configuration to provide informatiom on Heartbeat, Device Status refresh. Default is true.",
+                "type": "boolean",
+                "default": true
+            },
             "debug": {
-                "title": "Debug",
-                "description": "Enable debug mode. Default is false.",
+                "title": "Debug logging",
+                "description": "Set configuration to provide debug information. This is only useful during set-up or testing. Default is false.",
                 "type": "boolean",
                 "default": false
             }
