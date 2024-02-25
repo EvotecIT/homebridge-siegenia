@@ -1,8 +1,6 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid } from 'homebridge';
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
-import { SiegeniaAccessory } from './platformAccessory';
 import { SiegeniaDevice } from './siegeniaDevice';
-import { DeviceTypeMap } from './siegeniaMapping';
 import { SiegeniaWindowAccessory } from './siegeniaWindow';
 
 export interface ExampleDevice {
@@ -61,73 +59,10 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
      * must not be registered again to prevent "duplicate UUID" errors.
      */
     discoverDevices() {
-
-        // EXAMPLE ONLY
+        this.log.info('Discovering devices...');
         // A real plugin you would discover accessories from the local network, cloud services
         // or a user-defined array in the platform config.
-        const exampleDevices: ExampleDevice[] = [
-            //     {
-            //         uniqueId: 'ABCD',
-            //         displayName: 'Bedroom',
-            //     },
-            //     // {
-            //     //     uniqueId: 'EFGH',
-            //     //     displayName: 'Kitchen',
-            //     // },
-        ];
-
-        // // loop over the discovered devices and register each one if it has not already been registered
-        // for (const device of exampleDevices) {
-
-        //     // generate a unique id for the accessory this should be generated from
-        //     // something globally unique, but constant, for example, the device serial
-        //     // number or MAC address
-        //     const uuid = this.api.hap.uuid.generate(device.uniqueId);
-
-        //     // see if an accessory with the same uuid has already been registered and restored from
-        //     // the cached devices we stored in the `configureAccessory` method above
-        //     const existingAccessory = this.accessories.find(accessory => accessory.UUID === uuid);
-
-        //     if (existingAccessory) {
-        //         // the accessory already exists
-        //         this.log.info('Restoring existing accessory from cache:', existingAccessory.displayName);
-
-        //         // if you need to update the accessory.context then you should run `api.updatePlatformAccessories`. eg.:
-        //         // existingAccessory.context.device = device;
-        //         // this.api.updatePlatformAccessories([existingAccessory]);
-
-        //         // create the accessory handler for the restored accessory
-        //         // this is imported from `platformAccessory.ts`
-        //         new SiegeniaAccessory(this, existingAccessory);
-
-        //         // it is possible to remove platform accessories at any time using `api.unregisterPlatformAccessories`, eg.:
-        //         // remove platform accessories when no longer present
-        //         // this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [existingAccessory]);
-        //         // this.log.info('Removing existing accessory from cache:', existingAccessory.displayName);
-        //     } else {
-        //         // the accessory does not yet exist, so we need to create it
-        //         this.log.info('Adding new accessory:', device.displayName);
-
-        //         // create a new accessory
-        //         const accessory = new this.api.platformAccessory(device.displayName, uuid);
-
-        //         // store a copy of the device object in the `accessory.context`
-        //         // the `context` property can be used to store any data about the accessory you may need
-        //         accessory.context.device = device;
-
-        //         // create the accessory handler for the newly create accessory
-        //         // this is imported from `platformAccessory.ts`
-        //         new SiegeniaAccessory(this, accessory);
-
-        //         // link the accessory to your platform
-        //         this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
-        //     }
-        // }
-
-
-
-        this.log.info('Discovering devices...');
-
+        const exampleDevices: ExampleDevice[] = [];
         // Connect to the device and get its info
         const device = new SiegeniaDevice({
             ip: this.config.ip, // replace with your device IP
@@ -136,15 +71,18 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
             logger: (message: string) => this.log.info(message),
         });
 
+        device.on('error', (err) => {
+            this.log.error('Failed to connect first:', err.message);
+            // handle the error here, e.g. retry connection, log the error, etc.
+        });
         device.connect((err) => {
             if (err) {
-                this.log.error('Failed to connect:', err);
+                //this.log.error('Failed to connect second:', err.message);
                 return;
             }
-
-            device.loginUser(this.config.username, this.config.password, (err) => { // replace 'username' and 'password' with your credentials
+            device.loginUser(this.config.username, this.config.password, (err) => {
                 if (err) {
-                    this.log.error('Failed to login:', err);
+                    this.log.error('Failed to login. Please check your credenitals. Error reported:', err.message);
                     return;
                 }
 
@@ -181,9 +119,9 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                     // Log the discovered devices here
                     this.log.info('Discovered devices:', this.accessories.map(a => a.displayName).join(', '));
                 });
-
             });
         });
+
 
         this.log.info('Discovered devices:', this.accessories.map(a => a.displayName).join(', '));
 
