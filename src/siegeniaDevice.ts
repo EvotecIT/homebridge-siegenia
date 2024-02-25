@@ -1,5 +1,5 @@
 ﻿import { EventEmitter } from 'events';
-import ws from 'ws';
+import ws, { WebSocket } from 'ws';
 
 interface SiegeniaOptions {
     ip: string;
@@ -41,6 +41,9 @@ export class SiegeniaDevice extends EventEmitter {
     heartbeatTimeout: NodeJS.Timeout | null;
     errorCounter: number;
     stop: boolean;
+
+    private retryInterval = 1000;  // Start with a 1 second retry interval
+    private maxRetries = 10;  // Maximum number of retries
 
     constructor(options: SiegeniaOptions) {
         super();
@@ -148,9 +151,6 @@ export class SiegeniaDevice extends EventEmitter {
                     return;
                 }
 
-                // Log the successful heartbeat
-                //console.log('Heartbeat successful', response);
-
                 // Call the heartbeat method again to keep the session alive
                 this.heartbeat(delay);
             });
@@ -189,9 +189,9 @@ export class SiegeniaDevice extends EventEmitter {
         this.sendRequest('getDeviceDetails', callback);
     }
 
-    connect(callback?: Function): void {
-        if (this.websocket) {
-            return callback && callback(new Error('initializeCall for Websocket, but Websocket already set, so ignore call'));
+    connect(callback?: Function, retries = 0): void {
+        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            return callback && callback(new Error('WebSocket connection already established'));
         }
         this.stop = false;
         this.websocket = new ws(this.wsProtocol + '://' + this.ip + ':' + this.port + '/WebSocket', {
@@ -233,6 +233,9 @@ export class SiegeniaDevice extends EventEmitter {
         this.websocket.on('error', (error) => {
             this.logger(this.ip + ': Websocket Error ' + error);
             this.emit('error', error);
+            if (callback) {
+                callback(error);
+            }
         });
         this.websocket.on('message', (message) => {
             this.logger(this.ip + ': RECEIVE: ' + message);
@@ -247,8 +250,9 @@ export class SiegeniaDevice extends EventEmitter {
                 if (this.awaitingResponses[msg.id].timeout) {
                     clearTimeout(this.awaitingResponses[msg.id].timeout);
                 }
-                if (this.awaitingResponses[msg.id].callback) {
-                    // Call the callback with the response from the server
+                if (msg.status === 'not_authenticated' || msg.status === 'authentication_error') {
+                    this.awaitingResponses[msg.id].callback(new Error(msg.status));
+                } else if (this.awaitingResponses[msg.id].callback) {
                     this.awaitingResponses[msg.id].callback(null, msg);
                 }
                 delete this.awaitingResponses[msg.id];
@@ -256,6 +260,7 @@ export class SiegeniaDevice extends EventEmitter {
                 this.emit('message', msg);
             }
         });
+
     }
 
     disconnect(): void {
