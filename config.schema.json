@@ -26,6 +26,36 @@
             "password": {
                 "description": "Password",
                 "type": "string"
+            },
+            "maxRetries:": {
+                "title": "Max Retries",
+                "description": "Max retries for connection. Default is 3.",
+                "type": "integer",
+                "default": 3
+            },
+            "waitTimeBetweenRetries": {
+                "title": "First Wait Time Between Retries",
+                "description": "First Wait time between retries in seconds. Default is 5. This is doubled after each retry.",
+                "type": "integer",
+                "default": 5
+            },
+            "pollingInterval": {
+                "title": "Polling Interval",
+                "description": "Polling interval in seconds for device state. Default is 5.",
+                "type": "integer",
+                "default": 5
+            },
+            "heartbeatInterval": {
+                "title": "Heartbeat Interval",
+                "description": "Heartbeat interval in seconds. Default is 10.",
+                "type": "integer",
+                "default": 10
+            },
+            "debug": {
+                "title": "Debug",
+                "description": "Enable debug mode. Default is false.",
+                "type": "boolean",
+                "default": false
             }
         },
         "required": [
