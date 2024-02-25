@@ -1,6 +1,4 @@
-﻿/* eslint-disable lines-between-class-members */
-/* eslint-disable indent */
-import { EventEmitter } from 'events';
+﻿import { EventEmitter } from 'events';
 import ws from 'ws';
 
 interface SiegeniaOptions {
