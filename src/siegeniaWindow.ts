@@ -60,7 +60,7 @@ export class SiegeniaWindowAccessory {
 
             // Set the accessory information
             this.accessory.getService(this.api.hap.Service.AccessoryInformation)!
-                .setCharacteristic(this.api.hap.Characteristic.Manufacturer, "Siegenia")
+                .setCharacteristic(this.api.hap.Characteristic.Manufacturer, "Siegenia " + info.data.devicename)
                 .setCharacteristic(this.api.hap.Characteristic.Model, DeviceTypeMap[info.data.type])
                 .setCharacteristic(this.api.hap.Characteristic.SerialNumber, info.data.serialnr);
         });
