@@ -4,10 +4,6 @@
 
 </p>
 
-<span align="center">
-
-
-
 ## How communication works
 
 
