@@ -6,6 +6,8 @@ interface SiegeniaOptions {
     port?: number;
     wsProtocol?: string;
     logger?: Function;
+    maxRetries?: number;
+    retryInterval?: number;
 }
 interface Request {
     command: string;
@@ -42,8 +44,8 @@ export class SiegeniaDevice extends EventEmitter {
     errorCounter: number;
     stop: boolean;
 
-    private retryInterval = 1000;  // Start with a 1 second retry interval
-    private maxRetries = 10;  // Maximum number of retries
+    private defaultRetryInterval = 10;  // Start with a 1 second retry interval
+    private defaultMaxRetries = 10;  // Maximum number of retries
 
     constructor(options: SiegeniaOptions) {
         super();
@@ -113,14 +115,29 @@ export class SiegeniaDevice extends EventEmitter {
         this.websocket.send(JSON.stringify(req));
     }
 
-    loginUser(user: string, password: string, callback: Function): void {
+    loginUser(user: string, password: string, callback: Function, retries = 0): void {
         const req: LoginRequest = {
             'command': 'login',
             'user': user,
             'password': password,
             'long_life': false
         };
-        this.sendRequest(req, callback);
+        this.sendRequest(req, (err, response) => {
+            if (err) {
+                const maxRetries = this.options.maxRetries || this.defaultMaxRetries;  // Default to 3 retries if not defined
+                if (retries < maxRetries) {
+                    let waitTime = retries * 5 + 5;
+                    if (waitTime > 60) waitTime = 60;
+                    this.logger(`Login failed. Retrying in ${waitTime} seconds... (${retries + 1})`);
+                    setTimeout(() => this.loginUser(user, password, callback, retries + 1), waitTime * 1000);
+                } else {
+                    this.logger('Login failed after maximum retries');
+                    callback(err);
+                }
+            } else {
+                callback(null, response);
+            }
+        });
     }
 
     loginToken(token: string, callback: Function): void {
@@ -219,14 +236,21 @@ export class SiegeniaDevice extends EventEmitter {
                 this.heartbeatTimeout = null;
             }
             if (!this.stop) {
-                let reconnectDelay = this.errorCounter * 5 + 5;
-                if (reconnectDelay > 60) reconnectDelay = 60;
-                this.logger(this.ip + ': Reconnect in ' + reconnectDelay + 's');
-                this.reconnectTimeout = setTimeout(() => {
-                    this.logger(this.ip + ': Reconnect ... (' + this.errorCounter + ')');
-                    this.reconnectTimeout = null;
-                    this.connect();
-                }, reconnectDelay * 1000);
+                const maxRetries = this.options.maxRetries || this.defaultMaxRetries;
+                if (retries < maxRetries) {
+                    let reconnectDelay = this.options.retryInterval || this.defaultRetryInterval;
+                    reconnectDelay *= Math.pow(2, retries);
+                    if (reconnectDelay > 60) reconnectDelay = 60;
+                    this.logger(this.ip + ': Reconnect in ' + reconnectDelay + 's');
+                    this.reconnectTimeout = setTimeout(() => {
+                        this.logger(this.ip + ': Reconnect ... (' + (retries + 1) + ')');
+                        this.reconnectTimeout = null;
+                        this.connect(callback, retries + 1);
+                    }, reconnectDelay * 1000);
+                } else {
+                    this.logger('Connection failed after maximum retries');
+                    this.emit('error', new Error('Connection failed after maximum retries'));
+                }
             }
             this.emit('closed', code, reason);
         });
