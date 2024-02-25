@@ -2,7 +2,7 @@
     "private": true,
     "displayName": "Siegenia",
     "name": "homebridge-siegenia",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Homebridge plugin for Siegenia",
     "license": "MIT",
     "repository": {
@@ -11,6 +11,20 @@
     },
     "bugs": {
         "url": "https://github.com/EvotecIT/homebridge-siegenia/issues"
+    },
+    "funding": [
+        {
+            "type": "paypal",
+            "url": "https://paypal.me/PrzemyslawKlys"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/PrzemyslawKlys"
+        }
+    ],
+    "author": {
+        "name": "PrzemyslawKlys @ Evotec",
+        "url": "https://evotec.xyz"
     },
     "engines": {
         "homebridge": ">=1.6.0",
