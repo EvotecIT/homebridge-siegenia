@@ -1,7 +1,7 @@
 ﻿import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
 import { DeviceTypeMap } from './siegeniaMapping';
-import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP, Logging } from 'homebridge';
+import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP } from 'homebridge';
 
 export class SiegeniaWindowAccessory {
     private readonly log: Logger;
@@ -15,7 +15,12 @@ export class SiegeniaWindowAccessory {
     private windowState: string | undefined; // The current state of the window
     private targetPosition: number; // The target position of the window
 
-    constructor(private readonly platform: SiegeniaPlatform, private readonly accessory: PlatformAccessory, private readonly device: SiegeniaDevice, log: Logger, config: PlatformConfig, api: API) {
+    constructor(
+        private readonly platform: SiegeniaPlatform,
+        private readonly accessory: PlatformAccessory,
+        private readonly device: SiegeniaDevice,
+        log: Logger, config: PlatformConfig, api: API) {
+
         this.log = log;
         this.config = config;
         this.api = api;
@@ -232,9 +237,8 @@ export class SiegeniaWindowAccessory {
 
     // Perform the stop action
     performStopAction() {
-        const command = 'STOP';
         // Send the command to the device
-        this.device.setDeviceParams({ openclose: { 0: command } }, (err, response) => {
+        this.device.setDeviceParams({ stop: { 0: true } }, (err, response) => {
             if (err) {
                 this.log.error('Failed to set device params:', err);
                 return;
