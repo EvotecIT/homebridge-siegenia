@@ -8,6 +8,10 @@ interface SiegeniaOptions {
     logger?: Function;
     maxRetries?: number;
     retryInterval?: number;
+    debug?: boolean;
+    heartbeatInterval?: number;
+    pollInterval?: number;
+    informational?: boolean;
 }
 interface Request {
     command: string;
@@ -29,7 +33,7 @@ interface LoginRequest extends Request {
 }
 
 export class SiegeniaDevice extends EventEmitter {
-    options: SiegeniaOptions;
+    public options: SiegeniaOptions;
     ip: string;
     port: number;
     wsProtocol: string;
@@ -110,8 +114,9 @@ export class SiegeniaDevice extends EventEmitter {
             }, this.responseWaitTime);
         }
 
-
-        this.logger(this.ip + ': SEND: ' + JSON.stringify(req));
+        if (this.options.debug) {
+            this.logger(this.ip + ': SEND: ' + JSON.stringify(req));
+        }
         this.websocket.send(JSON.stringify(req));
     }
 
@@ -262,7 +267,9 @@ export class SiegeniaDevice extends EventEmitter {
             }
         });
         this.websocket.on('message', (message) => {
-            this.logger(this.ip + ': RECEIVE: ' + message);
+            if (this.options.debug) {
+                this.logger(this.ip + ': RECEIVE: ' + message);
+            }
             let msg;
             try {
                 msg = JSON.parse(message.toString());

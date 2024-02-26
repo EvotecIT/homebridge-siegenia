@@ -69,6 +69,12 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
             port: this.config.port || 443, // optional, default is 443
             wsProtocol: this.config.wsProtocol || 'wss', // optional, default is 'wss'
             logger: (message: string) => this.log.info(message),
+            debug: this.config.debug || false, // optional, default is false
+            pollInterval: this.config.pollInterval || 5, // optional, default is 5
+            heartbeatInterval: this.config.heartbeatInterval || 10, // optional, default is 5
+            retryInterval: this.config.retryInterval || 5, // optional, default is 5
+            maxRetries: this.config.maxRetries || 3, // optional, default is 3
+            informational: this.config.informational || true, // optional, default is false
         });
 
         device.on('error', (err) => {
@@ -94,7 +100,9 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                         return;
                     }
 
-                    this.log.info('Device Info:', info);
+                    if (this.device?.options.debug) {
+                        this.log.info('Device Info:', info);
+                    }
 
                     // Use the serialnr as the UUID
                     const uuid = this.api.hap.uuid.generate(info.data.serialnr);

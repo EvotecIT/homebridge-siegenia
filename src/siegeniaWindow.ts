@@ -52,8 +52,9 @@ export class SiegeniaWindowAccessory {
                 return;
             }
 
-            this.log.info('Device Info:', info);
-
+            if (this.device.options.debug) {
+                this.log.info('Device Info:', info);
+            }
             // Set the accessory information
             this.accessory.getService(this.api.hap.Service.AccessoryInformation)!
                 .setCharacteristic(this.api.hap.Characteristic.Manufacturer, "Siegenia " + info.data.devicename)
@@ -70,7 +71,14 @@ export class SiegeniaWindowAccessory {
                     return;
                 }
 
-                this.log.info('Device Params:', params);
+                if (this.device.options.debug) {
+                    this.log.info('Device Params:', params);
+                }
+
+                // lets log the device status so user knows what is happening
+                if (this.device.options.informational) {
+                    this.log.info('Device status for', params.data.devicename, "is", params.data.states[0]);
+                }
 
                 // Update the window state
                 const newState = params.data.states[0];
