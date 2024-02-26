@@ -6,6 +6,12 @@
     "schema": {
         "type": "object",
         "properties": {
+            "name": {
+                "title": "Name",
+                "description": "Name of your device in Homekit. Default is Siegenia Window. You can change it to anything you want.",
+                "type": "string",
+                "default": "Siegenia Window"
+            },
             "ip": {
                 "title": "Device IP",
                 "description": "Hostname or IP address of your device",
