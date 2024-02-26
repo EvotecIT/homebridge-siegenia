@@ -9,18 +9,13 @@ export class SiegeniaWindowAccessory {
     private readonly config: PlatformConfig;
     private readonly api: API;
     private readonly name: string;
+    private readonly buttonName: string;
     private readonly service: Service;
-    private windowState: string | undefined;
-    private targetPosition: number;
+    private stopService: Service; // "Stop" button service, allowing you to press stop during open or close scenario
+    private windowState: string | undefined; // The current state of the window
+    private targetPosition: number; // The target position of the window
 
-    constructor(
-        private readonly platform: SiegeniaPlatform,
-        private readonly accessory: PlatformAccessory,
-        private readonly device: SiegeniaDevice,
-        log: Logger,
-        config: PlatformConfig,
-        api: API
-    ) {
+    constructor(private readonly platform: SiegeniaPlatform, private readonly accessory: PlatformAccessory, private readonly device: SiegeniaDevice, log: Logger, config: PlatformConfig, api: API) {
         this.log = log;
         this.config = config;
         this.api = api;
@@ -29,7 +24,10 @@ export class SiegeniaWindowAccessory {
         this.windowState = undefined;
 
         // extract name from config
-        this.name = config.name || 'default';
+        this.name = config.name || 'Siegenia Window';
+
+        // extract buttonName from config
+        this.buttonName = config.buttonName || 'Siegenia Window Stop Button';
 
         // create a new Window service
         this.service = new this.api.hap.Service.Window(this.name);
@@ -57,12 +55,21 @@ export class SiegeniaWindowAccessory {
             }
             // Set the accessory information
             this.accessory.getService(this.api.hap.Service.AccessoryInformation)!
-                .setCharacteristic(this.api.hap.Characteristic.Manufacturer, "Siegenia " + info.data.devicename)
+                .setCharacteristic(this.api.hap.Characteristic.Manufacturer, 'Siegenia ' + info.data.devicename)
                 .setCharacteristic(this.api.hap.Characteristic.Model, DeviceTypeMap[info.data.type])
                 .setCharacteristic(this.api.hap.Characteristic.SerialNumber, info.data.serialnr);
         });
 
         this.accessory.addService(this.service);
+
+        // Poll the device for updates
+        let pollInterval;
+        if (this.device && this.device.options && typeof this.device.options.pollInterval === 'number') {
+            pollInterval = this.device.options.pollInterval * 1000;
+        } else {
+            // Handle the error or set a default value for pollInterval
+            pollInterval = 5000; // Default value (5 seconds)
+        }
 
         setInterval(() => {
             this.device.getDeviceParams((err, params) => {
@@ -87,13 +94,21 @@ export class SiegeniaWindowAccessory {
 
                     // Update the 'Current Position' characteristic
                     const newPosition = this.handleCurrentPositionGet();
-                    this.service.updateCharacteristic(this.api.hap.Characteristic.CurrentPosition, newPosition);
+                    this.service?.updateCharacteristic(this.api.hap.Characteristic.CurrentPosition, newPosition);
                 }
             });
-        }, 5000);
+        }, pollInterval);
 
         // Initialize targetPosition
         this.targetPosition = 0;  // Assume the target position is closed initially
+
+        // Add the "Switch" service
+        this.stopService = this.accessory.addService(this.api.hap.Service.Switch, this.buttonName, 'stop');
+
+        // Configure the "On" characteristic of the "Switch" service
+        this.stopService.getCharacteristic(this.api.hap.Characteristic.On)
+            .on('get', this.handleStopGet.bind(this))
+            .on('set', this.handleStopSet.bind(this));
     }
 
     public getDeviceInfo(callback: (err: any, info: any) => void) {
@@ -184,4 +199,49 @@ export class SiegeniaWindowAccessory {
             this.targetPosition = value as number;
         });
     }
+
+    // Handle requests to get the current value of the "On" characteristic
+    handleStopGet(callback) {
+        callback(null, false); // The "Stop" button is always off
+    }
+
+    // Handle requests to set the "On" characteristic
+    handleStopSet(value, callback) {
+        if (value && this.stopService.getCharacteristic(this.api.hap.Characteristic.On).value === false) {
+            // The "Stop" button was pressed, perform the stop action here
+            this.performStopAction();
+
+            // Turn the "Stop" button "off" again after a short delay
+            setTimeout(() => {
+                this.stopService.getCharacteristic(this.api.hap.Characteristic.On).updateValue(false);
+            }, 1000); // Delay of 1 second
+        }
+
+        callback(null);
+    }
+
+
+    // Handle changes to the "ProgrammableSwitchEvent" characteristic
+    handleStopChange(value) {
+        if (value.newValue === this.api.hap.Characteristic.ProgrammableSwitchEvent.SINGLE_PRESS) {
+            // The "Stop" button was pressed, perform the stop action here
+            this.performStopAction();
+        }
+    }
+
+
+    // Perform the stop action
+    performStopAction() {
+        const command = 'STOP';
+        // Send the command to the device
+        this.device.setDeviceParams({ openclose: { 0: command } }, (err, response) => {
+            if (err) {
+                this.log.error('Failed to set device params:', err);
+                return;
+            }
+
+            this.log.info('Set device params response:', response);
+        });
+    }
+
 }
