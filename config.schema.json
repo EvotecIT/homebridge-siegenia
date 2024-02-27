@@ -33,7 +33,17 @@
                 "description": "Password",
                 "type": "string"
             },
-            "maxRetries:": {
+            "showButtonService": {
+                "title": "Show Button Service",
+                "type": "boolean",
+                "default": true
+            },
+            "showTelevisionService": {
+                "title": "Show Television Service",
+                "type": "boolean",
+                "default": true
+            },
+            "maxRetries": {
                 "title": "Max Retries",
                 "description": "Max retries for connection. Default is 3.",
                 "type": "integer",
@@ -69,11 +79,53 @@
                 "type": "boolean",
                 "default": false
             }
+        }
+    },
+    "layout": [
+        {
+            "type": "fieldset",
+            "title": "Device Information",
+            "expandable": true,
+            "expanded": true,
+            "items": [
+                "name",
+                "ip",
+                "port",
+                "username",
+                "password"
+            ]
         },
-        "required": [
-            "ip",
-            "username",
-            "password"
-        ]
-    }
+        {
+            "type": "fieldset",
+            "title": "Services",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "showButtonService",
+                "showTelevisionService"
+            ]
+        },
+        {
+            "type": "fieldset",
+            "title": "Advanced",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "maxRetries",
+                "retryInterval",
+                "pollingInterval",
+                "heartbeatInterval"
+            ]
+        },
+        {
+            "type": "fieldset",
+            "title": "Logging",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "informational",
+                "debug"
+            ]
+        }
+    ]
 }
