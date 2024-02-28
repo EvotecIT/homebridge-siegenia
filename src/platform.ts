@@ -42,10 +42,8 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
         });
     }
 
-    /**
-     * This function is invoked when homebridge restores cached accessories from disk at startup.
-     * It should be used to setup event handlers for characteristics and update respective values.
-     */
+    // This function is invoked when homebridge restores cached accessories from disk at startup.
+    // It should be used to setup event handlers for characteristics and update respective values.
     configureAccessory(accessory: PlatformAccessory) {
         this.log.info('Loading accessory from cache:', accessory.displayName);
 
@@ -53,11 +51,9 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
         this.accessories.push(accessory);
     }
 
-    /**
-     * This is an example method showing how to register discovered accessories.
-     * Accessories must only be registered once, previously created accessories
-     * must not be registered again to prevent "duplicate UUID" errors.
-     */
+    //  This is an example method showing how to register discovered accessories.
+    // Accessories must only be registered once, previously created accessories
+    // must not be registered again to prevent "duplicate UUID" errors.
     discoverDevices() {
         this.log.info('Discovering devices...');
         // A real plugin you would discover accessories from the local network, cloud services
@@ -75,6 +71,7 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
             retryInterval: this.config.retryInterval || 5, // optional, default is 5
             maxRetries: this.config.maxRetries || 3, // optional, default is 3
             informational: this.config.informational || true, // optional, default is false
+            heartbeatDisabled: !this.config.enableHeartbeat || true, // optional, default is false
         });
 
         device.on('error', (err) => {
