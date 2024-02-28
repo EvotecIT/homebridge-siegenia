@@ -8,7 +8,6 @@ export interface ExampleDevice {
     // other properties...
 }
 
-
 export class SiegeniaPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
     public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
@@ -51,7 +50,7 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
         this.accessories.push(accessory);
     }
 
-    //  This is an example method showing how to register discovered accessories.
+    // This is an example method showing how to register discovered accessories.
     // Accessories must only be registered once, previously created accessories
     // must not be registered again to prevent "duplicate UUID" errors.
     discoverDevices() {
