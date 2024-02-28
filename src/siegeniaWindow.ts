@@ -1,17 +1,12 @@
 ﻿import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
-import { DeviceTypeMap } from './siegeniaMapping';
-import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP } from 'homebridge';
-
+import { API, Logger, PlatformAccessory, PlatformConfig } from 'homebridge';
 import { TelevisionService } from './serviceTelevision';
 import { WindowService } from './serviceWindow';
 import { ButtonService } from './serviceButton';
-import { EventEmitter } from 'events';
 import { SharedState } from './sharedState';
 
-
 export class SiegeniaWindowAccessory {
-
     private televisionService: TelevisionService | null = null;
     private windowService: WindowService;
     private buttonService: ButtonService | null = null;

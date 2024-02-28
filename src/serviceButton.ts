@@ -1,10 +1,7 @@
-﻿import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP } from 'homebridge';
+﻿import { API, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
-import { DeviceTypeMap } from './siegeniaMapping';
-import { SiegeniaWindowAccessory } from './siegeniaWindow';
 import { SharedState } from './sharedState';
-
 
 export class ButtonService {
     private readonly buttonName: string;
