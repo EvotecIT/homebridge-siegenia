@@ -38,13 +38,15 @@ export class SiegeniaWindowAccessory {
         this.showTelevisionService = config.showTelevisionService;
 
         // Create the services
-        if (this.showTelevisionService) {
-            this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState);
-        }
+        this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState);
+
         if (this.showButtonService) {
             this.buttonService = new ButtonService(platform, accessory, device, log, config, api, this.sharedState);
         }
-        this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState);
+
+        if (this.showTelevisionService) {
+            this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState);
+        }
 
         this.log = log;
         //this.config = config;
