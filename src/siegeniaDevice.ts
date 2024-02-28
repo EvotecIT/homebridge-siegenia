@@ -1,11 +1,14 @@
 ﻿import { EventEmitter } from 'events';
 import ws, { WebSocket } from 'ws';
 
+type LoggerFunction = (message: string, error?: Error) => void;
+type CallbackFunction = (error?: Error | null, response?: any) => void;
+
 interface SiegeniaOptions {
     ip: string;
     port?: number;
     wsProtocol?: string;
-    logger?: Function;
+    logger?: LoggerFunction;
     maxRetries?: number;
     retryInterval?: number;
     debug?: boolean;
@@ -38,7 +41,7 @@ export class SiegeniaDevice extends EventEmitter {
     ip: string;
     port: number;
     wsProtocol: string;
-    logger: Function;
+    logger: LoggerFunction;
     websocket: ws | null;
     requestId: number;
     awaitingResponses: any;
@@ -75,7 +78,7 @@ export class SiegeniaDevice extends EventEmitter {
         this.stop = false;
     }
 
-    sendRequest(command: string | Request, params: any, callback?: Function): void {
+    sendRequest(command: string | Request, params: any, callback?: CallbackFunction): void {
         if (typeof params === 'function') {
             callback = params;
             params = undefined;
@@ -121,7 +124,7 @@ export class SiegeniaDevice extends EventEmitter {
         this.websocket.send(JSON.stringify(req));
     }
 
-    loginUser(user: string, password: string, callback: Function, retries = 0): void {
+    loginUser(user: string, password: string, callback: CallbackFunction, retries = 0): void {
         const req: LoginRequest = {
             'command': 'login',
             'user': user,
@@ -148,7 +151,7 @@ export class SiegeniaDevice extends EventEmitter {
         });
     }
 
-    loginToken(token: string, callback: Function): void {
+    loginToken(token: string, callback: CallbackFunction): void {
         const req: LoginRequest = {
             'command': 'login',
             'token': token,
@@ -156,7 +159,7 @@ export class SiegeniaDevice extends EventEmitter {
         this.sendRequest(req, callback);
     }
 
-    logout(callback: Function): void {
+    logout(callback: CallbackFunction): void {
         this.sendRequest('logout', callback);
     }
 
@@ -185,39 +188,39 @@ export class SiegeniaDevice extends EventEmitter {
         }, delay);
     }
 
-    getDeviceState(callback: Function): void {
+    getDeviceState(callback: CallbackFunction): void {
         this.sendRequest('getDeviceState', callback);
     }
 
-    resetDevice(callback: Function): void {
+    resetDevice(callback: CallbackFunction): void {
         this.sendRequest('resetDevice', callback);
     }
 
-    rebootDevice(callback: Function): void {
+    rebootDevice(callback: CallbackFunction): void {
         this.sendRequest('rebootDevice', callback);
     }
 
-    renewCert(callback: Function): void {
+    renewCert(callback: CallbackFunction): void {
         this.sendRequest('renewCert', callback);
     }
 
-    getDeviceInfo(callback: Function): void {
+    getDeviceInfo(callback: CallbackFunction): void {
         this.sendRequest('getDevice', callback);
     }
 
-    getDeviceParams(callback: Function): void {
+    getDeviceParams(callback: CallbackFunction): void {
         this.sendRequest('getDeviceParams', callback);
     }
 
-    setDeviceParams(params: any, callback: Function): void {
+    setDeviceParams(params: any, callback: CallbackFunction): void {
         this.sendRequest('setDeviceParams', params, callback);
     }
 
-    getDeviceDetails(callback: Function): void {
+    getDeviceDetails(callback: CallbackFunction): void {
         this.sendRequest('getDeviceDetails', callback);
     }
 
-    connect(callback?: Function, retries = 0): void {
+    connect(callback?: CallbackFunction, retries = 0): void {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
             return callback && callback(new Error('WebSocket connection already established'));
         }
