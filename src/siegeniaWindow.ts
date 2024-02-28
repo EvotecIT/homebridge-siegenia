@@ -66,7 +66,7 @@ export class SiegeniaWindowAccessory {
 
                 // lets log the device status so user knows what is happening
                 if (this.device.options.informational) {
-                    this.log.info('Device status for', params.data.devicename, "is", params.data.states[0]);
+                    this.log.info('Device status for', params.data.devicename, 'is', params.data.states[0]);
                 }
 
                 // Update the window state
