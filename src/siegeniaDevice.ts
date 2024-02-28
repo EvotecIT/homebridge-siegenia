@@ -12,6 +12,7 @@ interface SiegeniaOptions {
     heartbeatInterval?: number;
     pollInterval?: number;
     informational?: boolean;
+    heartbeatDisabled?: boolean;
 }
 interface Request {
     command: string;
@@ -158,6 +159,9 @@ export class SiegeniaDevice extends EventEmitter {
     }
 
     heartbeat(delay: number = 10000): void {
+        if (this.options.heartbeatDisabled) {
+            return;
+        }
         this.heartbeatTimeout = setTimeout(() => {
             this.heartbeatTimeout = null;
             this.sendRequest('keepAlive', { 'extend_session': true }, (err, response) => {

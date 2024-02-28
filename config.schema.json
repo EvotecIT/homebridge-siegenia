@@ -33,7 +33,17 @@
                 "description": "Password",
                 "type": "string"
             },
-            "maxRetries:": {
+            "showButtonService": {
+                "title": "Show Button Service",
+                "type": "boolean",
+                "default": true
+            },
+            "showTelevisionService": {
+                "title": "Show Television Service",
+                "type": "boolean",
+                "default": true
+            },
+            "maxRetries": {
                 "title": "Max Retries",
                 "description": "Max retries for connection. Default is 3.",
                 "type": "integer",
@@ -50,6 +60,12 @@
                 "description": "Polling interval in seconds for device state. Default is 5.",
                 "type": "integer",
                 "default": 5
+            },
+            "enableHeartbeat": {
+                "title": "Enable Heartbeat",
+                "description": "Set configuration to enable heartbeat. Default is false. By default device status is refreshed every X seconds (pollingInterval) which makes heartbeat redundant. If you have issues with device status not being updated you can enable this. This will send a heartbeat every X seconds (heartbeatInterval) to device to ensure it's still connected.",
+                "type": "boolean",
+                "default": false
             },
             "heartbeatInterval": {
                 "title": "Heartbeat Interval",
@@ -69,11 +85,54 @@
                 "type": "boolean",
                 "default": false
             }
+        }
+    },
+    "layout": [
+        {
+            "type": "fieldset",
+            "title": "Device Information",
+            "expandable": true,
+            "expanded": true,
+            "items": [
+                "name",
+                "ip",
+                "port",
+                "username",
+                "password"
+            ]
         },
-        "required": [
-            "ip",
-            "username",
-            "password"
-        ]
-    }
+        {
+            "type": "fieldset",
+            "title": "Services",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "showButtonService",
+                "showTelevisionService"
+            ]
+        },
+        {
+            "type": "fieldset",
+            "title": "Advanced",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "maxRetries",
+                "retryInterval",
+                "pollingInterval",
+                "heartbeatInterval",
+                "enableHeartbeat"
+            ]
+        },
+        {
+            "type": "fieldset",
+            "title": "Logging",
+            "expandable": true,
+            "expanded": false,
+            "items": [
+                "informational",
+                "debug"
+            ]
+        }
+    ]
 }
