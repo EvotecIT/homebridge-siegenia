@@ -80,6 +80,8 @@
         ],
         "@typescript-eslint/member-delimiter-style": [
             "warn"
-        ]
+        ],
+        // We need to come back to this one, as it's a not great to ignore those
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }
