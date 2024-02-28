@@ -12,14 +12,15 @@ import { SharedState } from './sharedState';
 
 export class SiegeniaWindowAccessory {
 
-    private televisionService: TelevisionService;
+    private televisionService: TelevisionService | null = null;
     private windowService: WindowService;
-    private buttonService: ButtonService;
+    private buttonService: ButtonService | null = null;
     private readonly log: Logger;
     private readonly config: PlatformConfig;
     private readonly api: API;
     private readonly name: string;
-
+    private showButtonService: boolean;
+    private showTelevisionService: boolean;
     private sharedState = new SharedState();
 
     //private stopService: Service; // "Stop" button service, allowing you to press stop during open or close scenario
@@ -41,23 +42,24 @@ export class SiegeniaWindowAccessory {
             pollInterval = 5000; // Default value (5 seconds)
         }
 
-        //const sharedState = new SharedState();
+        this.showButtonService = config.showButtonService;
+        this.showTelevisionService = config.showTelevisionService;
 
-
-        this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState);
+        // Create the services
+        if (this.showTelevisionService) {
+            this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState);
+        }
+        if (this.showButtonService) {
+            this.buttonService = new ButtonService(platform, accessory, device, log, config, api, this.sharedState);
+        }
         this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState);
-        this.buttonService = new ButtonService(platform, accessory, device, log, config, api, this.sharedState);
 
         this.log = log;
         this.config = config;
         this.api = api;
 
-        // Initialize windowState
-        //this.windowState = undefined;
-
         // extract name from config
         this.name = config.name || 'Siegenia Window';
-
 
         setInterval(() => {
             this.device.getDeviceParams((err, params) => {
@@ -86,7 +88,7 @@ export class SiegeniaWindowAccessory {
 
                     // Set the Active characteristic of the Television service to 1 (on)
                     // basically we want it to always be on
-                    this.televisionService.setActiveState(1);
+                    this.televisionService?.setActiveState(1);
 
                     // Update the ActiveIdentifier characteristic
                     // if (this.windowState) {
