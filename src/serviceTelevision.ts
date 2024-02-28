@@ -26,24 +26,54 @@ export class TelevisionService {
         this.accessory.addService(this.televisionService);
 
 
-        // Define your window states in the order you want them to appear
-        const windowStatesOrder = ['Moving', 'Open', 'Stop Over', 'Close No Lock', 'Gap', 'Close', 'Closed', 'Stopped'];
+        // // Define your window states in the order you want them to appear
+        // const windowStatesOrder = ['Moving', 'Open', 'Stop Over', 'Close No Lock', 'Gap', 'Close', 'Closed', 'Stopped'];
 
-        // Define your window states
-        const windowStates = {
-            'Moving': 'MOVING',
-            'Open': 'OPEN',
-            'Gap': 'GAP_VENT',
-            'Stop Over': 'STOP_OVER',
-            'Close No Lock': 'CLOSE_WO_LOCK',
-            'Close': 'CLOSE',
-            'Stopped': 'STOPPED',
-            'Closed': 'CLOSED',
-        };
+        // // Define your window states
+        // const windowStates = new Map([
+        //     ['Moving', 'MOVING'],
+        //     ['Open', 'OPEN'],
+        //     ['Gap', 'GAP_VENT'],
+        //     ['Stop Over', 'STOP_OVER'],
+        //     ['Close No Lock', 'CLOSE_WO_LOCK'],
+        //     ['Close', 'CLOSE'],
+        //     ['Stopped', 'STOPPED'],
+        //     ['Closed', 'CLOSED'],
+        // ]);
 
+        let windowActionStates = new Map([
+            ['Open', {
+                'action': 'OPEN',
+                'state': 'OPEN'
+            }],
+            ['Stopped', {
+                'action': 'STOP',
+                'state': 'STOPPED'
+            }],
+            ['Stop Over', {
+                'action': 'STOP_OVER',
+                'state': 'STOP_OVER'
+            }],
+            ['Close No Lock', {
+                'action': 'CLOSE_WO_LOCK',
+                'state': 'CLOSE_WO_LOCK'
+            }],
+            ['Gap', {
+                'action': 'GAP_VENT',
+                'state': 'GAP_VENT'
+            }],
+            ['Close', {
+                'action': 'CLOSE',
+                'state': 'CLOSED'
+            }],
+            ['Moving', {
+                'action': 'MOVE',
+                'state': 'MOVING'
+            }]
+        ]);
 
-        // Add each window state as an input source to the Television service in the order defined in windowStatesOrder
-        windowStatesOrder.forEach((windowState, index) => {
+        // Add each window state as an input source to the Television service
+        Array.from(windowActionStates.keys()).forEach((windowState, index) => {
             this.log.info('Adding input source:', windowState, ' with index:', index);
             const inputSourceService = new this.api.hap.Service.InputSource(windowState, windowState);
             inputSourceService
@@ -51,46 +81,29 @@ export class TelevisionService {
                 .setCharacteristic(this.api.hap.Characteristic.ConfiguredName, windowState)
                 .setCharacteristic(this.api.hap.Characteristic.IsConfigured, this.api.hap.Characteristic.IsConfigured.CONFIGURED)
                 .setCharacteristic(this.api.hap.Characteristic.CurrentVisibilityState, this.api.hap.Characteristic.CurrentVisibilityState.SHOWN);
-
             this.accessory.addService(inputSourceService);
             this.televisionService.addLinkedService(inputSourceService);
         });
-
 
         // Listen for changes to the Active Identifier characteristic
         this.televisionService.getCharacteristic(this.api.hap.Characteristic.ActiveIdentifier)
             .on('set', (value, callback) => {
                 // Get the selected window state
-                const selectedWindowState = Object.keys(windowStates)[value as number];
-
+                const selectedWindowState = Array.from(windowActionStates.keys())[value as number];
                 // Get the command for the selected window state
-                const command = windowStates[selectedWindowState];
-
+                const command = windowActionStates.get(selectedWindowState)?.action;
                 // Send the command to the device
                 this.device.setDeviceParams({ openclose: { 0: command } }, (err, response) => {
                     if (err) {
                         this.log.error('Failed to set device params:', err);
                         return;
                     }
-
                     this.log.info('Set device params response:', response);
-
                     // Update the window state
-                    sharedState.windowState = command;
-
-                    // Wait for 5 seconds before switching back to the current input
-                    setTimeout(() => {
-                        if (this.sharedState.windowState) {
-                            const currentInput = Object.keys(windowStates).indexOf(this.sharedState.windowState);
-                            this.televisionService.setCharacteristic(this.api.hap.Characteristic.ActiveIdentifier, currentInput);
-                        }
-                    }, 5000); // Delay of 5 seconds
-
+                    this.sharedState.windowState = windowActionStates.get(selectedWindowState)?.state;
+                    callback(null);
                 });
-
-                callback(null);
             });
-        // Initialize windowState
 
     }
     // Other methods related to TelevisionService
