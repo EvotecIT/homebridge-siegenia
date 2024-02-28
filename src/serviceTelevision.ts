@@ -25,22 +25,7 @@ export class TelevisionService {
         // Add the Television service to the accessory
         this.accessory.addService(this.televisionService);
 
-
-        // // Define your window states in the order you want them to appear
-        // const windowStatesOrder = ['Moving', 'Open', 'Stop Over', 'Close No Lock', 'Gap', 'Close', 'Closed', 'Stopped'];
-
-        // // Define your window states
-        // const windowStates = new Map([
-        //     ['Moving', 'MOVING'],
-        //     ['Open', 'OPEN'],
-        //     ['Gap', 'GAP_VENT'],
-        //     ['Stop Over', 'STOP_OVER'],
-        //     ['Close No Lock', 'CLOSE_WO_LOCK'],
-        //     ['Close', 'CLOSE'],
-        //     ['Stopped', 'STOPPED'],
-        //     ['Closed', 'CLOSED'],
-        // ]);
-
+        // Set the service name
         let windowActionStates = new Map([
             ['Open', {
                 'action': 'OPEN',
