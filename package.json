@@ -1,5 +1,5 @@
 {
-    "private": true,
+    "private": false,
     "displayName": "Siegenia",
     "name": "homebridge-siegenia",
     "version": "0.1.1",

@@ -74,6 +74,7 @@ export class SiegeniaDevice extends EventEmitter {
         this.errorCounter = 0;
         this.stop = false;
     }
+
     sendRequest(command: string | Request, params: any, callback?: Function): void {
         if (typeof params === 'function') {
             callback = params;
@@ -92,10 +93,9 @@ export class SiegeniaDevice extends EventEmitter {
         let req: Request;
         if (typeof command === 'string') {
             req = {
-                'command': command
+                'command': command,
             };
-        }
-        else {
+        } else {
             req = command;
         }
         if (params !== undefined) {
@@ -126,14 +126,16 @@ export class SiegeniaDevice extends EventEmitter {
             'command': 'login',
             'user': user,
             'password': password,
-            'long_life': false
+            'long_life': false,
         };
         this.sendRequest(req, (err, response) => {
             if (err) {
                 const maxRetries = this.options.maxRetries || this.defaultMaxRetries;  // Default to 3 retries if not defined
                 if (retries < maxRetries) {
                     let waitTime = retries * 5 + 5;
-                    if (waitTime > 60) waitTime = 60;
+                    if (waitTime > 60) {
+                        waitTime = 60;
+                    }
                     this.logger(`Login failed. Retrying in ${waitTime} seconds... (${retries + 1})`);
                     setTimeout(() => this.loginUser(user, password, callback, retries + 1), waitTime * 1000);
                 } else {
@@ -149,7 +151,7 @@ export class SiegeniaDevice extends EventEmitter {
     loginToken(token: string, callback: Function): void {
         const req: LoginRequest = {
             'command': 'login',
-            'token': token
+            'token': token,
         };
         this.sendRequest(req, callback);
     }
@@ -222,7 +224,7 @@ export class SiegeniaDevice extends EventEmitter {
         this.stop = false;
         this.websocket = new ws(this.wsProtocol + '://' + this.ip + ':' + this.port + '/WebSocket', {
             rejectUnauthorized: false,
-            origin: this.wsProtocol + '://' + this.ip + ':' + this.port
+            origin: this.wsProtocol + '://' + this.ip + ':' + this.port,
         });
         this.websocket.on('open', () => {
             this.logger(this.ip + ': Websocket Open for Session, starting heartbeat');
@@ -230,8 +232,7 @@ export class SiegeniaDevice extends EventEmitter {
             if (!this.wasConnected) {
                 this.wasConnected = true;
                 this.emit('connected');
-            }
-            else {
+            } else {
                 this.emit('reconnected');
             }
             callback && callback();
@@ -249,7 +250,9 @@ export class SiegeniaDevice extends EventEmitter {
                 if (retries < maxRetries) {
                     let reconnectDelay = this.options.retryInterval || this.defaultRetryInterval;
                     reconnectDelay *= Math.pow(2, retries);
-                    if (reconnectDelay > 60) reconnectDelay = 60;
+                    if (reconnectDelay > 60) {
+                        reconnectDelay = 60;
+                    }
                     this.logger(this.ip + ': Reconnect in ' + reconnectDelay + 's');
                     this.reconnectTimeout = setTimeout(() => {
                         this.logger(this.ip + ': Reconnect ... (' + (retries + 1) + ')');

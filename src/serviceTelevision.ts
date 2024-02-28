@@ -24,35 +24,35 @@ export class TelevisionService {
         this.accessory.addService(this.televisionService);
 
         // Set the service name
-        let windowActionStates = new Map([
+        const windowActionStates = new Map([
             ['Open', {
                 'action': 'OPEN',
-                'state': 'OPEN'
+                'state': 'OPEN',
             }],
             ['Stopped', {
                 'action': 'STOP',
-                'state': 'STOPPED'
+                'state': 'STOPPED',
             }],
             ['Stop Over', {
                 'action': 'STOP_OVER',
-                'state': 'STOP_OVER'
+                'state': 'STOP_OVER',
             }],
             ['Close No Lock', {
                 'action': 'CLOSE_WO_LOCK',
-                'state': 'CLOSE_WO_LOCK'
+                'state': 'CLOSE_WO_LOCK',
             }],
             ['Gap', {
                 'action': 'GAP_VENT',
-                'state': 'GAP_VENT'
+                'state': 'GAP_VENT',
             }],
             ['Close', {
                 'action': 'CLOSE',
-                'state': 'CLOSED'
+                'state': 'CLOSED',
             }],
             ['Moving', {
                 'action': 'MOVE',
-                'state': 'MOVING'
-            }]
+                'state': 'MOVING',
+            }],
         ]);
 
         // Add each window state as an input source to the Television service
@@ -63,7 +63,8 @@ export class TelevisionService {
                 .setCharacteristic(this.api.hap.Characteristic.Identifier, index)
                 .setCharacteristic(this.api.hap.Characteristic.ConfiguredName, windowState)
                 .setCharacteristic(this.api.hap.Characteristic.IsConfigured, this.api.hap.Characteristic.IsConfigured.CONFIGURED)
-                .setCharacteristic(this.api.hap.Characteristic.CurrentVisibilityState, this.api.hap.Characteristic.CurrentVisibilityState.SHOWN);
+                .setCharacteristic(this.api.hap.Characteristic.CurrentVisibilityState,
+                    this.api.hap.Characteristic.CurrentVisibilityState.SHOWN);
             this.accessory.addService(inputSourceService);
             this.televisionService.addLinkedService(inputSourceService);
         });

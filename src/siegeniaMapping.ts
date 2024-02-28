@@ -9,5 +9,5 @@ export const DeviceTypeMap = {
     7: 'reserved',
     8: 'AEROTUBE',
     9: 'GENIUS B', // (obsolete - GENIUS B is now controlled by the Universal Module)
-    10: 'Universal Module'
+    10: 'Universal Module',
 };

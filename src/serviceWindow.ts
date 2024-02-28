@@ -68,35 +68,35 @@ export class WindowService {
         this.service?.updateCharacteristic(this.api.hap.Characteristic.CurrentPosition, newPosition);
     }
 
-     // Handle requests to get the current value of the "Current Position" characteristic
-     handleCurrentPositionGet() {
+    // Handle requests to get the current value of the "Current Position" characteristic
+    handleCurrentPositionGet() {
         this.log.debug('Triggered GET CurrentPosition');
 
         let currentValue;
 
         switch (this.sharedState.windowState) {
-            case 'OPEN':
-                currentValue = 100;
-                break;
-            case 'STOPPED':
-                currentValue = 70;
-                break;
-            case 'STOP_OVER':
-                currentValue = 40;
-                break;
-            case 'CLOSED_WO_LOCK':
-                currentValue = 20;
-                break;
-            case 'GAP_VENT':
-                currentValue = 10
-                break;
-            case 'CLOSED':
-                currentValue = 0;
-                break;
-            default:
-                this.log.debug('Unknown window state:', this.sharedState.windowState);
-                currentValue = 0;
-                break;
+                case 'OPEN':
+                    currentValue = 100;
+                    break;
+                case 'STOPPED':
+                    currentValue = 70;
+                    break;
+                case 'STOP_OVER':
+                    currentValue = 40;
+                    break;
+                case 'CLOSED_WO_LOCK':
+                    currentValue = 20;
+                    break;
+                case 'GAP_VENT':
+                    currentValue = 10;
+                    break;
+                case 'CLOSED':
+                    currentValue = 0;
+                    break;
+                default:
+                    this.log.debug('Unknown window state:', this.sharedState.windowState);
+                    currentValue = 0;
+                    break;
         }
         return currentValue;
     }
@@ -108,12 +108,12 @@ export class WindowService {
         let currentValue;
 
         switch (this.sharedState.windowState) {
-            case 'MOVING':
-                currentValue = this.api.hap.Characteristic.PositionState.INCREASING;
-                break;
-            default:
-                currentValue = this.api.hap.Characteristic.PositionState.STOPPED;
-                break;
+                case 'MOVING':
+                    currentValue = this.api.hap.Characteristic.PositionState.INCREASING;
+                    break;
+                default:
+                    currentValue = this.api.hap.Characteristic.PositionState.STOPPED;
+                    break;
         }
 
         return currentValue;
@@ -131,7 +131,7 @@ export class WindowService {
     handleTargetPositionSet(value: CharacteristicValue) {
         this.log.debug('Triggered SET TargetPosition:', value);
 
-        let commandValue = value as number;
+        const commandValue = value as number;
         let returnValue = 0;
         // Convert the target position to an open/close command
         let command;
@@ -139,13 +139,13 @@ export class WindowService {
             command = 'OPEN';
             returnValue = 100;
         } else if (commandValue > 40 && commandValue <= 99) {
-            command = 'STOP_OVER'
+            command = 'STOP_OVER';
             returnValue = 40;
         } else if (commandValue >= 20 && commandValue <= 40) {
-            command = 'CLOSE_WO_LOCK'
+            command = 'CLOSE_WO_LOCK';
             returnValue = 20;
         } else if (commandValue > 0 && commandValue < 20) {
-            command = 'GAP_VENT'
+            command = 'GAP_VENT';
             returnValue = 10;
         } else if (commandValue === 0) {
             command = 'CLOSE';
@@ -172,7 +172,4 @@ export class WindowService {
             this.targetPosition = returnValue; // as number;
         });
     }
-
-
-
 }
