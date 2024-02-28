@@ -17,16 +17,11 @@ interface SiegeniaOptions {
     informational?: boolean;
     heartbeatDisabled?: boolean;
 }
+
 interface Request {
     command: string;
     params?: any;
     id?: number;
-}
-
-interface Response {
-    id: number;
-    status: string;
-    data: any;
 }
 
 interface LoginRequest extends Request {
