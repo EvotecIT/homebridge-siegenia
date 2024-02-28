@@ -61,6 +61,12 @@
                 "type": "integer",
                 "default": 5
             },
+            "enableHeartbeat": {
+                "title": "Enable Heartbeat",
+                "description": "Set configuration to enable heartbeat. Default is false. By default device status is refreshed every X seconds (pollingInterval) which makes heartbeat redundant. If you have issues with device status not being updated you can enable this. This will send a heartbeat every X seconds (heartbeatInterval) to device to ensure it's still connected.",
+                "type": "boolean",
+                "default": false
+            },
             "heartbeatInterval": {
                 "title": "Heartbeat Interval",
                 "description": "Heartbeat interval in seconds. Default is 10.",
@@ -114,7 +120,8 @@
                 "maxRetries",
                 "retryInterval",
                 "pollingInterval",
-                "heartbeatInterval"
+                "heartbeatInterval",
+                "enableHeartbeat"
             ]
         },
         {
