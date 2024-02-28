@@ -10,7 +10,6 @@ export class WindowService {
     private readonly name: string;
     private readonly service: Service;
     private targetPosition: number; // The target position of the window
-    private windowState: string | undefined; // The current state of the window
 
     constructor(
         private readonly platform: SiegeniaPlatform,
@@ -21,8 +20,6 @@ export class WindowService {
         private readonly api: API,
         private readonly sharedState: SharedState,
     ) {
-        // Initialize windowState
-        this.windowState = undefined;
         // Initialize targetPosition
         this.targetPosition = 0;  // Assume the target position is closed initially
         // extract name from config
@@ -62,8 +59,6 @@ export class WindowService {
         });
 
         this.accessory.addService(this.service);
-
-
     }
 
     updateWindowState(newState: string) {
@@ -75,32 +70,36 @@ export class WindowService {
         this.service?.updateCharacteristic(this.api.hap.Characteristic.CurrentPosition, newPosition);
     }
 
-    // Other methods related to WindowService
-    // Handle requests to get the current value of the "Current Position" characteristic
-    handleCurrentPositionGet() {
+     // Handle requests to get the current value of the "Current Position" characteristic
+     handleCurrentPositionGet() {
         this.log.debug('Triggered GET CurrentPosition');
 
         let currentValue;
 
-        switch (this.windowState) {
+        switch (this.sharedState.windowState) {
             case 'OPEN':
                 currentValue = 100;
                 break;
-            case 'CLOSED_WOLOCK':
+            case 'STOPPED':
+                currentValue = 70;
+                break;
+            case 'STOP_OVER':
+                currentValue = 40;
+                break;
+            case 'CLOSED_WO_LOCK':
+                currentValue = 20;
+                break;
+            case 'GAP_VENT':
+                currentValue = 10
+                break;
             case 'CLOSED':
                 currentValue = 0;
                 break;
-            case 'STOPPED':
-                currentValue = 30;
-                break;
-            case 'GAP_VENT':
-                currentValue = 1;
-                break;
             default:
+                this.log.debug('Unknown window state:', this.sharedState.windowState);
                 currentValue = 0;
                 break;
         }
-
         return currentValue;
     }
 
@@ -110,7 +109,7 @@ export class WindowService {
 
         let currentValue;
 
-        switch (this.windowState) {
+        switch (this.sharedState.windowState) {
             case 'MOVING':
                 currentValue = this.api.hap.Characteristic.PositionState.INCREASING;
                 break;
@@ -134,12 +133,25 @@ export class WindowService {
     handleTargetPositionSet(value: CharacteristicValue) {
         this.log.debug('Triggered SET TargetPosition:', value);
 
+        let commandValue = value as number;
+        let returnValue = 0;
         // Convert the target position to an open/close command
         let command;
-        if (value === 100) {
+        if (commandValue === 100) {
             command = 'OPEN';
-        } else if (value === 0) {
+            returnValue = 100;
+        } else if (commandValue > 40 && commandValue <= 99) {
+            command = 'STOP_OVER'
+            returnValue = 40;
+        } else if (commandValue >= 20 && commandValue <= 40) {
+            command = 'CLOSE_WO_LOCK'
+            returnValue = 20;
+        } else if (commandValue > 0 && commandValue < 20) {
+            command = 'GAP_VENT'
+            returnValue = 10;
+        } else if (commandValue === 0) {
             command = 'CLOSE';
+            returnValue = 0;
         } else {
             // For now, do nothing if the target position is not 0 or 100
             return;
@@ -155,11 +167,11 @@ export class WindowService {
             this.log.info('Set device params response:', response);
 
             // Update the window state
-            let submitCommand = command === 'OPEN' ? 'OPEN' : 'CLOSED';
-            this.sharedState.windowState = submitCommand;
+            //let submitCommand = command === 'CLOSE' ? 'CLOSED': command;
+            //this.sharedState.windowState = submitCommand;
 
             // Update the target position
-            this.targetPosition = value as number;
+            this.targetPosition = returnValue; // as number;
         });
     }
 
