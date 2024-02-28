@@ -1,8 +1,7 @@
-﻿import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP } from 'homebridge';
+﻿import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
 import { DeviceTypeMap } from './siegeniaMapping';
-import { SiegeniaWindowAccessory } from './siegeniaWindow';
 import { SharedState } from './sharedState';
 
 
@@ -20,6 +19,7 @@ export class WindowService {
         private readonly config: PlatformConfig,
         private readonly api: API,
         private readonly sharedState: SharedState,
+        private readonly subtype: string,
     ) {
         // Initialize windowState
         this.windowState = undefined;
@@ -29,9 +29,30 @@ export class WindowService {
         this.name = config.name || 'Siegenia Window';
 
 
+        log.debug('Creating window service for', this.name);
+
         // Implement your WindowService here
         // create a new Window service
-        this.service = new this.api.hap.Service.Window(this.name);
+        // Check if the "Window" service already exists
+        let service = this.accessory.getServiceById(this.api.hap.Service.Window, this.subtype);
+
+        if (!service) {
+            // log.debug('Creating new Window service for', this.name);
+            // // Remove any existing services of the same type and subtype
+            // this.accessory.services.forEach(existingService => {
+            //     this.log.debug('Sub Service:', existingService.UUID, " ", existingService.subtype);
+            //     if (existingService.UUID === this.api.hap.Service.Window.UUID && existingService.subtype === this.subtype) {
+            //         this.log.debug('Removing existing service:', existingService.subtype);
+            //         this.accessory.removeService(existingService);
+            //     }
+            // });
+            // If the service does not exist, add it with the subtype
+            service = this.accessory.addService(this.api.hap.Service.Window, 'Window Service', this.subtype);
+
+        }
+
+        // Now we know that service is not undefined, so we can use it
+        this.service = service;
 
         // create handlers for required characteristics
         this.service.getCharacteristic(this.api.hap.Characteristic.CurrentPosition)
@@ -62,8 +83,6 @@ export class WindowService {
         });
 
         this.accessory.addService(this.service);
-
-
     }
 
     updateWindowState(newState: string) {
@@ -75,7 +94,6 @@ export class WindowService {
         this.service?.updateCharacteristic(this.api.hap.Characteristic.CurrentPosition, newPosition);
     }
 
-    // Other methods related to WindowService
     // Handle requests to get the current value of the "Current Position" characteristic
     handleCurrentPositionGet() {
         this.log.debug('Triggered GET CurrentPosition');
@@ -86,21 +104,25 @@ export class WindowService {
             case 'OPEN':
                 currentValue = 100;
                 break;
-            case 'CLOSED_WOLOCK':
-            case 'CLOSED':
-                currentValue = 0;
-                break;
             case 'STOPPED':
-                currentValue = 30;
+                currentValue = 70;
+                break;
+            case 'STOP_OVER':
+                currentValue = 40;
+                break;
+            case 'CLOSED_WOLOCK':
+                currentValue = 20;
                 break;
             case 'GAP_VENT':
-                currentValue = 1;
+                currentValue = 10
+                break;
+            case 'CLOSED':
+                currentValue = 0;
                 break;
             default:
                 currentValue = 0;
                 break;
         }
-
         return currentValue;
     }
 

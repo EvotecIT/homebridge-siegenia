@@ -13,7 +13,7 @@ import { SharedState } from './sharedState';
 export class SiegeniaWindowAccessory {
 
     private televisionService: TelevisionService | null = null;
-    private windowService: WindowService;
+    private windowService: WindowService | null = null;
     private buttonService: ButtonService | null = null;
     private readonly log: Logger;
     private readonly config: PlatformConfig;
@@ -31,7 +31,12 @@ export class SiegeniaWindowAccessory {
         private readonly platform: SiegeniaPlatform,
         private readonly accessory: PlatformAccessory,
         private readonly device: SiegeniaDevice,
-        log: Logger, config: PlatformConfig, api: API) {
+        log: Logger, config: PlatformConfig, api: API,
+        info: any) {
+
+        this.log = log;
+        this.config = config;
+        this.api = api;
 
         // Poll the device for updates
         let pollInterval;
@@ -45,18 +50,31 @@ export class SiegeniaWindowAccessory {
         this.showButtonService = config.showButtonService;
         this.showTelevisionService = config.showTelevisionService;
 
+        let serial = info.data.serialnr;
+        this.log.debug('Listing services for', serial);
+        this.accessory.services.forEach(existingService => {
+            this.log.debug('Global Service:', existingService.UUID, " ", existingService.subtype);
+            //this.accessory.removeService(existingService);
+        });
+
+        this.log.debug('Listing services again', serial);
+        this.accessory.services.forEach(existingService => {
+            this.log.debug('Global Service:', existingService.UUID, " ", existingService.subtype);
+            //this.accessory.removeService(existingService);
+        });
+        this.log.debug('Listing services done', serial);
+
         // Create the services
         if (this.showTelevisionService) {
-            this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState);
+            //this.televisionService = new TelevisionService(platform, accessory, device, log, config, api, this.sharedState, 'television' + serial);
         }
         if (this.showButtonService) {
-            this.buttonService = new ButtonService(platform, accessory, device, log, config, api, this.sharedState);
+           // this.buttonService = new ButtonService(platform, accessory, device, log, config, api, this.sharedState, 'button' + serial);
         }
-        this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState);
 
-        this.log = log;
-        this.config = config;
-        this.api = api;
+        this.log.debug('Creating window service for', serial);
+
+        this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState, 'window' + serial);
 
         // extract name from config
         this.name = config.name || 'Siegenia Window';
@@ -83,8 +101,8 @@ export class SiegeniaWindowAccessory {
                     this.sharedState.windowState = newState;
 
                     // Update the 'Current Position' characteristic
-                    const newPosition = this.windowService.handleCurrentPositionGet();
-                    this.windowService.updatePosition(newPosition);
+                    const newPosition = this.windowService?.handleCurrentPositionGet();
+                    this.windowService?.updatePosition(newPosition);
 
                     // Set the Active characteristic of the Television service to 1 (on)
                     // basically we want it to always be on

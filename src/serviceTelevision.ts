@@ -1,13 +1,11 @@
-﻿import { API, CharacteristicValue, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid, HAP } from 'homebridge';
+﻿import { API, Logger, PlatformAccessory, PlatformConfig, Service } from 'homebridge';
 import { SiegeniaPlatform } from './platform';
 import { SiegeniaDevice } from './siegeniaDevice';
-import { DeviceTypeMap } from './siegeniaMapping';
-import { SiegeniaWindowAccessory } from './siegeniaWindow';
 import { SharedState } from './sharedState';
-
 
 export class TelevisionService {
     private readonly televisionService: Service;
+    private readonly windowActionStates: Map<string, { action: string, state: string }>;
 
     constructor(
         private readonly platform: SiegeniaPlatform,
@@ -17,6 +15,7 @@ export class TelevisionService {
         private readonly config: PlatformConfig,
         private readonly api: API,
         private readonly sharedState: SharedState,
+        private readonly subtype: string,
     ) {
         // Implement your TelevisionService here
         // Create a new Television service
@@ -26,7 +25,7 @@ export class TelevisionService {
         this.accessory.addService(this.televisionService);
 
         // Set the service name
-        let windowActionStates = new Map([
+        this.windowActionStates = new Map([
             ['Open', {
                 'action': 'OPEN',
                 'state': 'OPEN'
@@ -58,7 +57,7 @@ export class TelevisionService {
         ]);
 
         // Add each window state as an input source to the Television service
-        Array.from(windowActionStates.keys()).forEach((windowState, index) => {
+        Array.from(this.windowActionStates.keys()).forEach((windowState, index) => {
             this.log.info('Adding input source:', windowState, ' with index:', index);
             const inputSourceService = new this.api.hap.Service.InputSource(windowState, windowState);
             inputSourceService
@@ -74,9 +73,9 @@ export class TelevisionService {
         this.televisionService.getCharacteristic(this.api.hap.Characteristic.ActiveIdentifier)
             .on('set', (value, callback) => {
                 // Get the selected window state
-                const selectedWindowState = Array.from(windowActionStates.keys())[value as number];
+                const selectedWindowState = Array.from(this.windowActionStates.keys())[value as number];
                 // Get the command for the selected window state
-                const command = windowActionStates.get(selectedWindowState)?.action;
+                const command = this.windowActionStates.get(selectedWindowState)?.action;
                 // Send the command to the device
                 this.device.setDeviceParams({ openclose: { 0: command } }, (err, response) => {
                     if (err) {
@@ -85,13 +84,12 @@ export class TelevisionService {
                     }
                     this.log.info('Set device params response:', response);
                     // Update the window state
-                    this.sharedState.windowState = windowActionStates.get(selectedWindowState)?.state;
+                    this.sharedState.windowState = this.windowActionStates.get(selectedWindowState)?.state;
                     callback(null);
                 });
             });
 
     }
-    // Other methods related to TelevisionService
 
     handleWindowStateChange(newState: string) {
         // Update windowState and do something

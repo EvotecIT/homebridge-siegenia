@@ -1,13 +1,12 @@
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, Service, Characteristic, uuid } from 'homebridge';
-import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SiegeniaDevice } from './siegeniaDevice';
 import { SiegeniaWindowAccessory } from './siegeniaWindow';
+import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 
 export interface ExampleDevice {
     uniqueId: string;
     // other properties...
 }
-
 
 export class SiegeniaPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
@@ -108,21 +107,32 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                     const uuid = this.api.hap.uuid.generate(info.data.serialnr);
 
                     // Create a new accessory
-                    const accessory = new this.api.platformAccessory('Siegenia Window', uuid);
+                    //const accessory = new this.api.platformAccessory('Siegenia Window', uuid);
 
-                    // Add the accessory to Homebridge
-                    this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+                    // Check if the accessory already exists in the cache
+                    let accessory = this.accessories.find(accessory => accessory.UUID === uuid);
+                    if (accessory) {
+                        // If the accessory exists, log a message and reuse it
+                        this.log.info('Reusing accessory from cache:', accessory.displayName);
+                    } else {
+                        accessory = new this.api.platformAccessory('Siegenia Window', uuid);
+                        // Add the accessory to Homebridge
+                        this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
+                        // Add the accessory to the list of registered accessories
+                        this.accessories.push(accessory);
 
-                    // Add the accessory to the list of registered accessories
-                    this.accessories.push(accessory);
-
-                    this.log.info('Adding new accessory:', accessory.displayName);
-
+                        this.log.info('Adding new accessory:', accessory.displayName);
+                    }
                     // Create a new SiegeniaWindowAccessory for the device
-                    const windowAccessory = new SiegeniaWindowAccessory(this, accessory, device, this.log, this.config, this.api);
-
+                    const windowAccessory = new SiegeniaWindowAccessory(this, accessory, device, this.log, this.config, this.api, info);
                     // Add the window accessory to the list
                     this.windowAccessories.push(windowAccessory);
+
+
+                    // Remove old accessories
+                    const oldAccessories = this.accessories.filter(a => a.UUID !== uuid);
+                    this.api.unregisterPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, oldAccessories);
+                    this.accessories = this.accessories.filter(a => a.UUID === uuid);
 
                     // Log the discovered devices here
                     this.log.info('Discovered devices:', this.accessories.map(a => a.displayName).join(', '));

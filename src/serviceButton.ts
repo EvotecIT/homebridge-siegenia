@@ -19,18 +19,22 @@ export class ButtonService {
         private readonly config: PlatformConfig,
         private readonly api: API,
         private readonly sharedState: SharedState,
+        private readonly subtype: string,
     ) {
         // Implement your ButtonService here
         // extract buttonName from config
         this.buttonName = config.buttonName || 'Siegenia Window Stop Button';
 
-        // Add the "Switch" service
-        this.stopService = this.accessory.addService(this.api.hap.Service.Switch, this.buttonName, 'stop');
+        // Check if the "Switch" service already exists
+        let service = this.accessory.getServiceById(this.api.hap.Service.Switch, this.subtype);
 
-        // Configure the "On" characteristic of the "Switch" service
-        this.stopService.getCharacteristic(this.api.hap.Characteristic.On)
-            .on('get', this.handleStopGet.bind(this))
-            .on('set', this.handleStopSet.bind(this));
+        if (!service) {
+            // If the service does not exist, add it with the subtype
+            service = this.accessory.addService(this.api.hap.Service.Switch, this.buttonName, this.subtype);
+        }
+
+        // Now we know that service is not undefined, so we can assign it to stopService
+        this.stopService = service;
 
     }
     // Other methods related to ButtonService
