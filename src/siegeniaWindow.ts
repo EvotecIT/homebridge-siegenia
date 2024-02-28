@@ -16,16 +16,13 @@ export class SiegeniaWindowAccessory {
     private windowService: WindowService;
     private buttonService: ButtonService | null = null;
     private readonly log: Logger;
-    private readonly config: PlatformConfig;
-    private readonly api: API;
-    private readonly name: string;
+    //private readonly config: PlatformConfig;
+    //private readonly api: API;
+    //private readonly name: string;
     private showButtonService: boolean;
     private showTelevisionService: boolean;
     private sharedState = new SharedState();
 
-    //private stopService: Service; // "Stop" button service, allowing you to press stop during open or close scenario
-    //private windowState: string | undefined; // The current state of the window
-    // private targetPosition: number; // The target position of the window
 
     constructor(
         private readonly platform: SiegeniaPlatform,
@@ -55,11 +52,11 @@ export class SiegeniaWindowAccessory {
         this.windowService = new WindowService(platform, accessory, device, log, config, api, this.sharedState);
 
         this.log = log;
-        this.config = config;
-        this.api = api;
+        //this.config = config;
+        //this.api = api;
 
         // extract name from config
-        this.name = config.name || 'Siegenia Window';
+        //this.name = config.name || 'Siegenia Window';
 
         setInterval(() => {
             this.device.getDeviceParams((err, params) => {
@@ -68,9 +65,9 @@ export class SiegeniaWindowAccessory {
                     return;
                 }
 
-                if (this.device.options.debug) {
-                    this.log.info('Device Params:', params);
-                }
+                //if (this.device.options.debug) {
+                //   this.log.info('Device Params:', params);
+                //}
 
                 // lets log the device status so user knows what is happening
                 if (this.device.options.informational) {
