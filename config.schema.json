@@ -1,6 +1,7 @@
 {
     "pluginAlias": "Siegenia",
     "pluginType": "platform",
+    "singular": true,
     "headerDisplay": "Basic support for Siegenia MHS Family Windoiws. See the [homebridge-siegenia](https://github.com/EvotecIT/homebridge-siegenia) page for more information.",
     "footerDisplay": "This plugin is provided by [Evotec](https://www.evotec.xyz).",
     "schema": {
@@ -10,14 +11,16 @@
                 "title": "Name",
                 "description": "Name of your device in Homekit. Default is Siegenia Window. You can change it to anything you want.",
                 "type": "string",
-                "default": "Siegenia Window"
+                "default": "Siegenia Window",
+                "required": true
             },
             "ip": {
                 "title": "Device IP",
                 "description": "Hostname or IP address of your device",
                 "placeholder": "e.g. 1.2.3.4",
                 "type": "string",
-                "format": "hostname"
+                "format": "hostname",
+                "required": true
             },
             "port": {
                 "title": "Device Port",
@@ -27,21 +30,25 @@
             },
             "username": {
                 "description": "Username",
-                "type": "string"
+                "type": "string",
+                "required": true
             },
             "password": {
                 "description": "Password",
-                "type": "string"
+                "type": "string",
+                "required": true
             },
             "showButtonService": {
                 "title": "Show Button Service",
+                "description": "Shows a switch (on/off) next to the window that acts as a stop button. Default is true. If you don't want to see the button in Homekit set this to false.",
                 "type": "boolean",
                 "default": true
             },
             "showTelevisionService": {
-                "title": "Show Television Service",
+                "title": "Shows Television Service",
+                "description": "This is a workaround to show different states of the window by using HDMI input sources. Default is false.",
                 "type": "boolean",
-                "default": true
+                "default": false
             },
             "maxRetries": {
                 "title": "Max Retries",
