@@ -2,6 +2,7 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, PlatformConfig, 
 import { PLATFORM_NAME, PLUGIN_NAME } from './settings';
 import { SiegeniaDevice } from './siegeniaDevice';
 import { SiegeniaWindowAccessory } from './siegeniaWindow';
+import os from 'os';
 
 export interface ExampleDevice {
     uniqueId: string;
@@ -102,7 +103,6 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
 
                     // Generate a unique identifier for this Homebridge instance based on the hostname
                     function getHomebridgeSystem() {
-                        const os = require('os');
                         return os.hostname();
                     }
 
@@ -110,6 +110,8 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                     // configuration option, or it could be generated based on some property of
                     // the Homebridge instance.
                     const homebridgeId = getHomebridgeSystem();
+
+                    this.log.debug('Current homebridgeId:', homebridgeId);
 
                     // Generate a unique UUID for the accessory using the homebridgeId and the
                     // serial number of the window.
