@@ -1,17 +1,45 @@
 <p align="center">
-
 <img src="https://github.com/homebridge/branding/raw/latest/logos/homebridge-wordmark-logo-vertical.png" width="150">
-
 </p>
 
-## How communication works
+<p align="center">
+<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Version" src="https://img.shields.io/npm/v/homebride-siegenia?style=flat-square&label=npm version"></a>
+<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/siegenia-homebridge?style=flat-square&label=downloads%20per%20month"></a>
+<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Downloads" src="https://img.shields.io/npm/dt/homebridge-siegenia?style=flat-square&label=downloads%20total"></a>
+</p>
 
+<p align="center">
+  <a href="https://github.com/EvotecIT/homebridge-siegenia"><img src="https://img.shields.io/github/languages/top/evotecit/homebridge-siegenia.svg?style=flat-square"></a>
+  <a href="https://github.com/EvotecIT/homebridge-siegenia"><img src="https://img.shields.io/github/languages/code-size/evotecit/homebridge-siegenia.svg?style=flat-square"></a>
+  <a href="https://github.com/EvotecIT/homebridge-siegenia"><img src="https://img.shields.io/github/license/EvotecIT/homebridge-siegenia.svg?style=flat-square"></a>
+  <a href="https://wakatime.com/badge/user/f1abc372-39bb-4b06-ad2b-3a24cf161f13/project/018dd711-1056-4cec-86b2-9151f91f8443"><img src="https://wakatime.com/badge/user/f1abc372-39bb-4b06-ad2b-3a24cf161f13/project/018dd711-1056-4cec-86b2-9151f91f8443.svg?style=flat-square" alt="wakatime"></a>
+</p>
+
+<p align="center">
+  <a href="https://twitter.com/PrzemyslawKlys"><img src="https://img.shields.io/twitter/follow/PrzemyslawKlys.svg?label=Twitter%20%40PrzemyslawKlys&style=flat-square"></a>
+  <a href="https://evotec.xyz/hub"><img src="https://img.shields.io/badge/Blog-evotec.xyz-2A6496.svg?style=flat-square"></a>
+  <a href="https://www.linkedin.com/in/pklys"><img src="https://img.shields.io/badge/LinkedIn-pklys-0077B5.svg?logo=LinkedIn&style=flat-square"></a>
+</p>
+
+## Homebridge Siegenia Plugin
+
+This is a plugin for [Homebridge](https://homebridge.io/) that exposes Siegenia Devices to **Apple Homekit**.
+Currently it supports MHS Family of devices (Windows), as this is the only device I have access to.
+If you have other devices, please let me know, and I will try to add support for them.
+
+This plugin was built with huge help of [@Apollon77](https://github.com/Apollon77) and his [ioBroker siegenia](https://github.com/Apollon77/ioBroker.siegenia) plugin.
+It allowed me to understand how the communication with Siegenia devices works.
+Without it this plugin wouldn't be possible.
+
+As this is my first plugin ever, and first typescript project, I'm open to any feedback, and help.
+
+## How communication works
+For the sake of understanding how the communication with Siegenia devices works, I will describe it here, as it may come in handy for someone.
 
 ### 1. Login
 ```
-[25.02.2024, 10:18:12] [Siegenia] 192.168.241.198: Websocket Open for Session, starting heartbeat
 [25.02.2024, 10:18:12] [Siegenia] 192.168.241.198: SEND: {"command":"login","user":"admin","password":"mypassword","long_life":false,"id":2}
-[25.02.2024, 10:18:12] [Siegenia] 192.168.241.198: RECEIVE: {"data":{"isadmin":true,"token":"yWjMYdldZW2z5PH3pSoo","user":"admin","userid":0},"id":2,"status":"ok"}
+[25.02.2024, 10:18:12] [Siegenia] 192.168.241.198: RECEIVE: {"data":{"isadmin":true,"token":"yWjMYdldZ","user":"admin","userid":0},"id":2,"status":"ok"}
 [25.02.2024, 10:18:12] [Siegenia] Logged in successfully
 ```
 
@@ -71,6 +99,7 @@
 
 ### Setup Development Environment
 
+
 ### Install Development Dependencies
 
 Using a terminal, navigate to the project folder and run this command to install the development dependencies:
@@ -93,12 +122,6 @@ Run this command so your global installation of Homebridge can discover the plug
 
 ```shell
 $ npm link
-```
-
-You can now start Homebridge, use the `-D` flag, so you can see debug log messages in your plugin:
-
-```shell
-$ homebridge -D
 ```
 
 ### Watch For Changes and Build Automatically
