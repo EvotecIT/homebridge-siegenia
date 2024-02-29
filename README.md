@@ -33,6 +33,30 @@ Without it this plugin wouldn't be possible.
 
 As this is my first plugin ever, and first typescript project, I'm open to any feedback, and help.
 
+![HomeKit Room Screen](https://raw.githubusercontent.com/EvotecIT/homebridge-siegenia/master/docs/images/HomekitSiegeniaWindow1.jpg) ![HomeKit Siegnia Window](https://raw.githubusercontent.com/EvotecIT/homebridge-siegenia/master/docs/images/HomekitSiegeniaWindow2.jpg)
+
+By default this plugin exposes the following services:
+- Window that can be used to open, close, close without lock, open with a gap
+- Switch Button (on/off) that acts as a stop button (turn on to stop the window, turning off does nothing, and should switch itself off)
+
+Since the Window doesn't natively support to open the Window to given percentage the window slider acts on hardcoded values that are:
+
+- When setting value:
+  - 0% - Close
+  - 0-20% - Gap vent open
+  - 20-40% - Close without lock
+  - 41-99% - Stop over
+  - 100% - Open
+- When reading value (depending on what is the state of the window) the window slider will show:
+  - 0% - Closed
+  - 10% - Gap vent open
+  - 20% - Closed without lock
+  - 40% - Stop over
+  - 70% - Stopped (when using manual stop button)
+  - 100% - Open
+
+The Stop Over value is configurable in Siegenia App, so it can be 30-90-120cm or any other value, and I guess the most used value to open a window.
+
 ## How communication works
 For the sake of understanding how the communication with Siegenia devices works, I will describe it here, as it may come in handy for someone.
 
