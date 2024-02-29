@@ -100,8 +100,20 @@ export class SiegeniaPlatform implements DynamicPlatformPlugin {
                         this.log.info('Device Info:', info);
                     }
 
-                    // Use the serialnr as the UUID
-                    const uuid = this.api.hap.uuid.generate(info.data.serialnr);
+                    // Generate a unique identifier for this Homebridge instance based on the hostname
+                    function getHomebridgeSystem() {
+                        const os = require('os');
+                        return os.hostname();
+                    }
+
+                    // Get a unique identifier for this Homebridge instance. This could be a
+                    // configuration option, or it could be generated based on some property of
+                    // the Homebridge instance.
+                    const homebridgeId = getHomebridgeSystem();
+
+                    // Generate a unique UUID for the accessory using the homebridgeId and the
+                    // serial number of the window.
+                    const uuid = this.api.hap.uuid.generate(homebridgeId + '-' + info.data.serialnr);
 
                     // Create a new accessory
                     const accessory = new this.api.platformAccessory('Siegenia Window', uuid);
