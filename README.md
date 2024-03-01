@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Version" src="https://img.shields.io/npm/v/homebride-siegenia?style=flat-square&label=npm version"></a>
-<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/siegenia-homebridge?style=flat-square&label=downloads%20per%20month"></a>
+<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Version" src="https://img.shields.io/npm/v/homebridge-siegenia?style=flat-square&label=npm version"></a>
+<a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Downloads" src="https://img.shields.io/npm/dm/homebridge-siegenia?style=flat-square&label=downloads%20per%20month"></a>
 <a href="https://www.npmjs.com/package/homebridge-siegenia"><img alt="NPM Downloads" src="https://img.shields.io/npm/dt/homebridge-siegenia?style=flat-square&label=downloads%20total"></a>
 </p>
 
