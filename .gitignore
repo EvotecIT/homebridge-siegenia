@@ -120,3 +120,4 @@ dist
 .pnp.*
 .vs/*
 /lib/*
+/ignore/*
