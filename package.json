@@ -57,5 +57,10 @@
         "rimraf": "5.0.5",
         "ts-node": "^10.9.2",
         "typescript": "5.3.3"
+    },
+    "overrides": {
+        "@typescript-eslint/typescript-estree": {
+            "minimatch": "9.0.9"
+        }
     }
 }
